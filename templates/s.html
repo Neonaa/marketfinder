@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Crash&Finder</title>
+        <link rel='shortcut icon' href='/favicon.ico' type='image/x-icon'/>
+        <style>
+            body, html {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #42f5dd;
+            }
+
+            #main-container {
+                margin: 0;
+                padding: 5px 100px;
+                background-color: #42f5dd;
+                color: white;
+            }
+
+            #main-table {
+                width: 100%;
+                border-collapse: collapse;
+                background-color: #8442f5;
+            }
+
+            #main-table tbody {
+            }
+            
+            #main-table th, #main-table td{
+                border: 1px solid rgb(43, 43, 43);
+                padding: 4px;
+            }
+
+            #main-table tr:hover {
+                background-color: rgb(43, 43, 43);
+            }
+
+            #main-table th {
+                background-color: black;
+            }
+
+            #main-table .avatar-cell {
+                background-size: 48px !important;
+                background-position: center !important;
+                height: 48px;
+                width: 48px;
+                padding: 1px;
+                cursor: pointer;
+            }
+
+            #main-table .copy-text-button {
+                display: inline-block;
+                border-radius: 4px;
+                background-color: green;
+                border: none;
+                color: #FFFFFF;
+                text-align: center;
+                padding: 5px;
+                width: 50px;
+                transition: all 0.5s;
+                cursor: pointer;
+                margin: 5px;
+            }
+
+            #main-table .copy-text-button span {
+                cursor: pointer;
+                display: inline-block;
+                position: relative;
+                transition: 0.5s;
+            }
+            #main-table .listing-row.visited {
+                background-color: #000000;
+                color: #dadada;
+            }
+            a:link {
+            color: rgb(255, 255, 255);
+            background-color: transparent;
+            text-decoration: none;
+            }
+
+            a:visited {
+            color: rgb(0, 150, 255);
+            background-color: transparent;
+            text-decoration: none;
+            }
+
+            a:hover {
+            color: rgb(255, 0, 0);
+            background-color: transparent;
+            text-decoration: underline;
+            }
+
+            a:active {
+            color: yellow;
+            background-color: transparent;
+            text-decoration: underline;
+            }
+			* {box-sizing: border-box;}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #e9e9e9;
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  color: black;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+  background-color: #2196F3;
+  color: white;
+}
+
+.topnav .search-container {
+  float: right;
+}
+
+.topnav input[type=text] {
+  padding: 6px;
+  margin-top: 8px;
+  font-size: 17px;
+  border: none;
+}
+
+.topnav .search-container button {
+  float: right;
+  padding: 6px;
+  margin-top: 8px;
+  margin-right: 16px;
+  background: #ddd;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+}
+
+.topnav .search-container button:hover {
+  background: #ccc;
+}
+
+@media screen and (max-width: 600px) {
+  .topnav .search-container {
+    float: none;
+  }
+  .topnav a, .topnav input[type=text], .topnav .search-container button {
+    float: none;
+    display: block;
+    text-align: left;
+    width: 100%;
+    margin: 0;
+    padding: 14px;
+  }
+  .topnav input[type=text] {
+    border: 1px solid #ccc;  
+  }
+}
+        </style>
+    </head>
+    <body onload="main()">
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+
+            <form>
+
+<div class="topnav">
+ <div class="form-group col-md-6">
+<label for="inputEmail4" style="color: white">Min. Price:</label>
+<input type="number" class="form-control" min="30" max="2000" name="minprice"value="55"placeholder="Min. Price">
+ <div class="form-group col-md-6">
+<label for="inputPassword4" style="color: white">Max. Price:</label>
+<input type="number" class="form-control" max="2000" name="maxprice" value="90"placeholder="Max. Price:">
+</div>
+  <a class="active" href="#home">შემქმნელის ფბ</a>
+      <button type="submit">მოძებნა</button>
+    </form>
+  </div>
+</div>
+<input type="checkbox" id="notificationCheckBox" name="notificationCheckBox" onclick="saveCheckBoxesState()" />
+<label for="notificationCheckBox" style="color: white;">Notification Sound</label>
+ <label for="refreshCheckBox" style="color: white;" checked>Auto Refresh</label>
+
+                  
+                  
+                </div>
+                
+
+            </form>
+
+
+            <table class="table" style="color: white">
+                <tbody>
+                    <tr>
+                        <th>ფოტო</th>
+                        <th>სახელი</th>
+                        <th>ნივთი</th>
+						<th>ფასი</th>
+						<th>მესიჯის ასლი</th>
+                    </tr>
+                    {% for listing in listings %}
+                        <tr class="listing-row" id="lr-{{ listing.owner_avatar }}-{{ listing.owner_name }}"> 
+                            <td href="https://steamcommunity.com/search/users/#text={{ listing.owner_name }}" 
+							    class="avatar-cell"
+                                target="_blank"  onClick="copyText('{{ listing.item_name }}')" 
+                                style="background: url('https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/{{ listing.owner_avatar }}.jpg')
+								no-repeat;"></td>
+                            <td><a href="https://steamcommunity.com/search/users/#text={{ listing.owner_name }}" target="_blank">{{ listing.owner_name }}</a></td>
+                            <td onclick="copyText('{{ listing.item_name }}')"> {{ listing.item_name }} - {{ listing.price }}$</td>
+							<td>{{ listing.price }}$</td>
+					        <td>
+                            <button class="copy-button" onclick="copyText(this)" lang="en">
+                                    EN
+                            </button>
+                            <button class="copy-button" onclick="copyText(this)" lang="cn">
+                                    CN
+                        </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+<script >
+  function setCheckboxesStatesFromLocalStorage() {
+    const notificationCheckBox = document.getElementById("notificationCheckBox");
+    const notificationState = eval(localStorage["notificationIsOn"]);
+    notificationCheckBox.checked = notificationState;
+
+
+    document.getElementById("refreshCheckBox").checked = eval(localStorage["refreshIsOn"]);
+    
+}
+
+
+function saveCheckBoxesState() {
+    const notificationCheckBox = document.getElementById("notificationCheckBox");
+    localStorage["notificationIsOn"] = notificationCheckBox.checked;
+
+    const autoRefreshCheckBox = document.getElementById("refreshCheckBox");
+    localStorage["refreshIsOn"] = autoRefreshCheckBox.checked;
+}
+
+function getItemName(arg = "") {
+    let from = arg.indexOf("-") + 2;
+    if (arg.includes("★")) from = arg.indexOf("★") + 2;
+    let to = arg.lastIndexOf("(") - 1;
+    to = to > 0 ? to : arg.length;
+    return arg.slice(from, to);
+
+}
+
+function copyText(element) {
+    if (!element) return;
+    let text = element.parentElement.parentElement.children[1].innerText;
+    text = getItemName(text);
+    let preText = "";
+    if (element.lang === "en") {
+        preText = "Hello add me please, I have reached my daily invite limit. I'm interested in your ";
+    } else if (element.lang === "cn") {
+        preText = "你好，请加我，我已达到每日邀请上限。我对你感兴趣 ";
+    }
+
+    const copyText = document.createElement('textArea')
+
+    copyText.value = preText + text
+    document.body.appendChild(copyText)
+
+    copyText.select()
+    copyText.setSelectionRange(0, 99999)
+
+    document.execCommand('copy')
+    document.body.removeChild(copyText)
+}
+
+function checkNewRecord() {
+    const lastRecord = document.querySelector("body > div > div > div > table > tbody > tr:nth-child(1)")?.innerText;
+
+    if (lastRecord === undefined) return;
+    if (lastRecord !== localStorage["lastRecord"]) {
+        notifySound();
+        localStorage["lastRecord"] = lastRecord;
+    }
+}
+
+function notifySound() {
+    const soundIsChecked = document.getElementById("notificationCheckBox").checked;
+    if (!soundIsChecked) return;
+
+    const audio = document.getElementById("audiotag1");// new Audio("notification.ogg");
+    audio.volume = 0.5;
+    audio.play();
+}
+
+function main() {
+    setCheckboxesStatesFromLocalStorage()
+    checkNewRecord();
+
+    setInterval(() => {
+        const refreshBool = document.getElementById("refreshCheckBox").checked;
+        if (refreshBool) location.reload();
+
+
+    }, 5e3)
+
+}
+
+main()
+</script>
+
+</body>
+
+</html>
